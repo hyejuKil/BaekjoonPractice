@@ -2,72 +2,23 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
+	static int r;
+	static int c;
+	static int count=0;
+	static int n;
+	static long b;
+	static int inputs[][];
 	 public static void main(String[] args) throws IOException {
 	      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	      BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 	      
 	      //입력
 	      String imsis[] = br.readLine().split(" ");
-	      int n = Integer.parseInt(imsis[0]);
-	      int m = Integer.parseInt(imsis[1]);
-	      String imsi;
-	      char first = 0;
-	      int count=0,count2=0; //바뀌는 글자 수
-	      char b[][] = new char[n+1][m+1];
+	      n = Integer.parseInt(imsis[0]);
+	      r = Integer.parseInt(imsis[1]);
+	      c = Integer.parseInt(imsis[2]);
 	      
-	      for(int i=0;i<n;i++)
-	      {
-	    	  imsi = br.readLine(); //한줄 읽기
-	    	  for(int j=0;j<m;j++)
-	    		  b[i][j] = imsi.charAt(j);
-	      }
-	      
-	      first = b[0][0];
-	      int mincount=-1, mincount2 = -1;
-	      
-	      for(int k=0;k<n+1-8;k++)
-	      {
-	    	  for(int l=0;l<m+1-8;l++)
-	    	  {
-	    		  count=0;
-	    		  count2=0;
-	    		  for(int i=k;i<k+8;i++)
-	    	      {
-	    	    	  for(int j=l;j<l+8;j++)
-	    	    	  {
-	    	    		  if((i%2)==(j%2)) //짝짝, 홀홀 -> 원본과 같은것
-	    	    		  {
-	    	    			  if(b[i][j] != first) //다를 경우 change
-	    	    				  count++;
-	    	    			  if(b[i][j] == first) //다를 경우 change
-	    	    				  count2++;
-	    	    			  
-	    	    		  }
-	    	    		  else //짝홀, 홀짝 -> 원본과 달라야 함
-	    	    		  {
-	    	    			  if(b[i][j] == first) //같은 경우 change
-	    	    				  count++;
-	    	    			  if(b[i][j] != first) //같은 경우 change
-	    	    				  count2++;
-	    	    		  }
-	    	    	  }
-	    	      }  
-	    		  if(mincount == -1)
-	    			  mincount = count;
-	    		  else
-	    			  mincount = min(mincount,count);
-	    		  
-	    		  if(mincount2 == -1)
-	    			  mincount2 = count2;
-	    		  else
-	    			  mincount2 = min(mincount2,count2);  
-	    	  }
-	      }
-	      
-	     // System.out.println("m1 : "+mincount +" m2 : "+mincount2);
-	      bw.write(min(mincount, mincount2)+"\n");
-	      bw.flush();
-	      
+	      System.out.println(B_1074(0, 0, n));
 	      
 	 }
 	 
@@ -77,6 +28,44 @@ public class Main {
 			 return a;
 		 else
 			 return b;
+	 }
+	 
+	 static int B_1074(int sero, int garo, int stage){
+		 
+		 
+		 System.out.println(sero+","+garo+" count : "+count);
+		 if(sero == r && garo == c ) //찾으려는 장소
+		 {
+			 System.out.println("in");
+			 return count;
+		 }
+		 if(count >= Math.pow(2, n) * Math.pow(2, n))
+			 return -1;
+		 
+		 
+		 else 
+		 {
+			 if(stage ==0)
+			 {
+				 int imsicount =count;
+				 count++;
+				 if(imsicount %4==0 || imsicount %4==2)
+				 {
+					 B_1074(sero,garo+(int)Math.pow(2,stage),stage);
+				 }
+				 else if(imsicount %4==1)
+				 {
+					 B_1074(sero+(int)Math.pow(2,stage),garo-(int)Math.pow(2,stage),stage); 
+				 }
+			 }
+			 else
+			 {
+				 int su = B_1074(sero,garo,stage-1);
+				 su = B_1074(sero,garo+(int)Math.pow(2,stage),stage-1);
+				  = B_1074(sero+(int)Math.pow(2,stage),garo-(int)Math.pow(2,stage-1)+1,stage-1);
+			 }
+		 }
+		return stage;
 	 }
 }
 
