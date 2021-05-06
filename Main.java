@@ -7,133 +7,44 @@ public class Main {
 	      BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 	      
 	      //입력
-	     int n =Integer.parseInt(br.readLine()); //연산의 개수
-	     int input = 0;
-	     ArrayList<Integer> a = new ArrayList<Integer>();
-	     for(int i=0;i<n;i++)
-	     {
-	    	 input = Integer.parseInt(br.readLine());
-	    	 
-	    	 if(input == 0) //Delete
-	    	 {
-	    		 a=  Delete_Minheap(a);
-//	    		 System.out.print("!");
-//	    		 for(int j=0;j<a.size();j++)
-//	    			 System.out.print(a.get(j)+" ");
-//	    		 System.out.println(" !");
-	    	 }
-	    	 else //Insert
-	    	 {
-	    		 a = Insert_Minheap(a, input);
-	    	 }
-	     }
+	      int n = Integer.parseInt(br.readLine());
+	      String imsis[] = br.readLine().split(" ");
+	      int inputs[] = new int[n];
+	      for(int i=0;i<n;i++)
+	      {
+	    	  inputs[i] = Integer.parseInt(imsis[i]);
+	      }
+	      
+	      //만약 이전 수보다 증가 시 -> 높이 += 현재높이
+	      //이전 수보다 감소 시 : 정산, 다른 오르막이랑 비교해서 max인지 
+	      
+	      int height =0;
+	      int maxheight = 0;
+	      for(int i=1;i<n;i++) 
+	      {
+	    	  if(inputs[i-1] < inputs[i]) //이전 항보다 증가 시
+	    	  {
+	    		  //높이 증가
+	    		  height += inputs[i] - inputs[i-1]; 
+	    	  }
+	    	  else //이전 높이보다 감소 또는 평지 -> 정산
+	    	  {
+	    		  if(maxheight < height) //가장 높은 오르막길일 경우
+	    		  {
+	    			  maxheight = height;
+	    		  }
+	    		  height = 0; //오르막길 높이 초기화
+	    	  }
+	      }
+	      
+	      if(height > maxheight)
+	      {
+	    	  maxheight = height;
+	      }
+	      
+	      bw.write(maxheight+"\n");
+	      bw.flush();
+	      
 	 }
-	 
-	 static ArrayList<Integer> Insert_Minheap(ArrayList<Integer> a, int input)
-	 {
-		 //가장 끝에 넣고, 점차 위로 올리며 정렬
-		 if(a.size()==0) //첫항
-		 {
-			 a.add(input);
-			 return a;
-		 }
-		 
-		 else
-		 {
-			 a.add(input); //제일 끝에 생성
-			 int now = a.size()-1; //현재 위치(배열 제일 끝)
-			 while(now>0 && Math.abs(a.get(now)) < Math.abs(a.get((now-1)/2))) //현재 위치가 root가 아니고, 부모보다 절대값이 작을 때 
-			 { 
-				 int temp = a.get((now-1)/2);
-				 a.set((now-1)/2, a.get(now));
-				 a.set(now,temp);
-				 now = (now-1)/2;
-			 }
-		 }
-		 return a;
-	 }
-	 
-	 static ArrayList<Integer> Delete_Minheap(ArrayList<Integer> a)
-	 {
-		 if(a.size()==0) //배열 비었을 시
-		 {
-			 System.out.println("0");
-			 return a;
-		 }
-		 
-		 else //Delete 가능
-		 {
-			 int out = a.get(0); //root항이 제거됨
-			 a.set(0, a.get(a.size()-1)); //제일 끝항 값으로 root항 값을 덮어씌움
-			 a.remove(a.size()-1); //끝항 제거
-			 int now = 0;
-			 
-			 //정렬 -> root값을 맞는 위치까지 비교하여 내림
-			 while(now<a.size()/2)
-			 { 
-				 if(now*2+2 > a.size())
-					 break;
-				if(now*2+2 == a.size() || Math.abs(a.get(now*2+1))<Math.abs(a.get(now*2+2))) //왼쪽이 오른쪽보다 더 작고 오른쪽이 존재할 때
-				{
-					if(Math.abs(a.get(now)) > Math.abs(a.get(now*2+1))) //자식 왼쪽값이랑 비교해서 부모가 더 클경우
-					{
-						//값 change
-							int temp = a.get(now*2+1);
-							a.set(now*2+1, a.get(now));
-							a.set(now,temp);
-							now = now *2 +1;	
-					}
-					else if(Math.abs(a.get(now)) == Math.abs(a.get(now*2+1))) //절대값은 같은데 수적으로 차이가 날 경우
-					{
-						//부모가 더 클결우 change
-						if(a.get(now) > (a.get(now*2+1)))
-						{
-							int temp = a.get(now*2+1);
-							a.set(now*2+1, a.get(now));
-							a.set(now,temp);
-							now = now *2 +1;
-						}
-					}
-					else
-						break;
-				}
-				else 
-				{
-					if(Math.abs(a.get(now)) > Math.abs(a.get(now*2+2))) //오른쪽값과 비교
-					 {
-						//값 change
-						 int temp = a.get(now*2+2);
-						 a.set(now*2+2, a.get(now));
-						 a.set(now,temp);
-						 now = now*2+2;
-					 }	
-					else if(Math.abs(a.get(now)) == Math.abs(a.get(now*2+2))) //절대값은 같은데 수적으로 차이가 날 경우
-					{
-						//부모가 더 클결우 change
-						if(a.get(now) > (a.get(now*2+2)))
-						{
-							int temp = a.get(now*2+2);
-							a.set(now*2+2, a.get(now));
-							a.set(now,temp);
-							now = now *2 +2;
-						}
-					}
-					else
-						break;
-				}
-			 }
-			 System.out.println(out);//root값
-			 return a; 
-		 }
-	 }
-	 
-	 static int min(int a, int b)
-	 {
-		 if(a<b)
-			 return a;
-		 else
-			 return b;
-	 }
-	 
 }
 
