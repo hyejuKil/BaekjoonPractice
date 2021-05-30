@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.io.*;
 import java.math.BigInteger;
 
@@ -6,50 +7,68 @@ public class Main {
 	static int n;
 	static int m;
 	static int b[];
-	static boolean isused[];
+	static boolean isvisit[];
+    static BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    
 	 public static void main(String[] args) throws IOException {
 		 
-	     BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
-	     BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 	     
 	     String inputs[] = br.readLine().split(" ");
 	     n = Integer.parseInt(inputs[0]);
+	     ConcurrentLinkedDeque<Integer> q = new ConcurrentLinkedDeque<Integer>();
 	     m = Integer.parseInt(inputs[1]);
-	     b = new int[m];
-	     isused = new boolean[n];
+	     inputs = br.readLine().split(" ");
+	     int ans=0;
+	     int count3=0;
 	     
-	     hamsu(0,1);
+	     for(int i=1;i<n;i++)
+	    	 q.add(i);
 	     
-}
-	 static void hamsu(int jarisu, int gap)
-	 {
-	     if(gap>n) //자리수의 값이 n+1 -> 끝일 경우
+	     for(int i=0;i<inputs.length;i++) //뽑아낼 수 갯수만큼
 	     {
-	    	 //앞자리수 +1로 리턴, isused 갱신
-	    	 if(jarisu == m-1) //끝자리
-	    		 return;
-	    	 isused[b[jarisu-1]] = false; //앞자리수 isued false
-	    	 isused[b[jarisu-1]+1] = true;
-	    	 hamsu(jarisu-1, gap+1);
-	     }
-	     else if(isused[gap] == true) //이미 쓰여지고 있는 경우
-	    	 hamsu(jarisu,gap+1);
-	     else //끝도 아니고, 이미쓰여지고 있지도 않고
-	     {
-	    	 //현재 수 저장, 다음 자리수로 고
-	    	 isused[gap] = true;
-	    	 b[jarisu] = gap;
-	    	 if(jarisu == m-1) //출력
+	    	 if(q.isEmpty())
+	    		 break;
+	    	 int su = Integer.parseInt(inputs[i]); //뽑아낼 수
+	    	 int count=0;
+	    	 Iterator<Integer> itr = q.iterator();
+	    	 while(itr.hasNext())
 	    	 {
-	    		 for(int i=0;i<m;i++)
-		    		 System.out.print(b[i]+" ");
-		    	 System.out.println();
-		    	 hamsu(jarisu,gap+1);
+	    		 if(itr.next() == su)
+	    		 {
+	    			 break; 
+	    		 }
+	    		 count++;
 	    	 }
-	    	 hamsu(jarisu+1, 1);
+	    	 
+	    	 if(count<=(q.size()/2)) //q의 중간보다 앞에 있을경우 -> 2번이 빠름
+	    	 {
+	    		 for(int j=0;j<count;j++)
+	    		 {
+	    			 int imsi = q.poll();
+	    			 q.add(imsi);
+	    		 }
+		    	 System.out.println(count);
+	    		 ans += count;
+	    	 }
+	    	 else //3번
+	    	 {
+	    		 for(int j=0;j<q.size()-count;j++)
+	    		 {
+	    			 int imsi = q.removeLast();
+	    			 q.addFirst(imsi);
+	    		 }
+		    	 System.out.println(q.size()-count);
+	    		 ans += q.size()-count+1; //+1 이유는 1번 사용하기 위해 제일 앞으로 불러와야 하기 때문
+	    		 count3++;
+	    	 }
+	    	 System.out.println("q.peek :"+q.peek());
+	    	 q.poll(); //1번
 	     }
-	 }
+	     if(count3>1)
+	    	 ans+=count3-2;
+	     bw.write(ans+"\n");
+	     bw.flush();
 }
-
-
+}
 
