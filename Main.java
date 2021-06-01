@@ -1,130 +1,127 @@
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.io.*;
-import java.math.BigInteger;
 
 public class Main {
-	static int n;
-	static boolean chess[][];
-	static boolean sero[];
-	static boolean garo[];
-	static int ans = 0;
-	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
-	public static void main(String[] args) throws IOException {
-
-		n = Integer.parseInt(br.readLine());
-
-		chess = new boolean[n][n];
-		sero = new boolean[n];
-		garo = new boolean[n];
-
-		DFS(0, 0, 0);
-
-		bw.write(ans + "\n");
-		bw.flush();
-	}
-
-	static void DFS(int y, int x, int count) {
-		for (int i = y; i < n; i++) {
-			if (count > i) // 남은 퀸 수보다 남은 줄 수가 더 작을 때
-			{
-				return;
-			}
-			if (sero[i] == true) // 가로에 이미 있음, 다음줄로
-			{
-				continue;
-			}
-			for (int j = 0; j < n; j++) {
-				// System.out.println("i : "+i+" j : "+j);
-				// 다른칸이랑 비교해야
-				if (garo[j] == true) // 세로에 이미 있음, 다음칸으로
-				{
-					continue;
-				}
-				// 대각선 비교
-				// 1사분면
-				int imsiy = i - 1;
-				int imsix = j + 1;
-
-				// 1사분면
-				boolean isnext = false;
-				while (imsiy >= 0 && imsix < n) // 안튀어나가도록
-				{
-					if (chess[imsiy--][imsix++] == true) // 이미 있음 -> 공격가능
-					{
-						isnext = true;
+	 public static void main(String[] args) throws IOException {
+	      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	      BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+	      
+	      //입력
+	     int n =Integer.parseInt(br.readLine()); //연산의 개수
+	     int input = 0;
+	     ArrayList<Integer> a = new ArrayList<Integer>();
+	     for(int i=0;i<n;i++)
+	     {
+	    	 input = Integer.parseInt(br.readLine());
+	    	 
+	    	 if(input == 0) //Delete
+	    	 {
+	    		 a=  Delete_Minheap(a);
+//	    		 System.out.print("!");
+//	    		 for(int j=0;j<a.size();j++)
+//	    			 System.out.print(a.get(j)+" ");
+//	    		 System.out.println(" !");
+	    	 }
+	    	 else //Insert
+	    	 {
+	    		 a = Insert_Minheap(a, input);
+//	    		 System.out.print("?");
+//	    		 for(int j=0;j<a.size();j++)
+//	    			 System.out.print(a.get(j)+" ");
+//	    		 System.out.println(" ?");
+	    	 }
+	     }
+	 }
+	 
+	 static ArrayList<Integer> Insert_Minheap(ArrayList<Integer> a, int input)
+	 {
+		 //가장 끝에 넣고, 점차 위로 올리며 정렬
+		 if(a.size()==0) //첫항
+		 {
+			 a.add(input);
+			 return a;
+		 }
+		 
+		 else
+		 {
+			 a.add(input); //제일 끝에 생성
+			 int now = a.size()-1; //현재 위치(배열 제일 끝)
+			 while(now>0 && Math.abs(a.get(now)) <= Math.abs(a.get((now-1)/2))) //현재 위치가 root가 아니고, 부모 노드보다 현재 노드가 더 작을
+			 { 
+				 if(now >1 &&Math.abs(a.get(now))== Math.abs(a.get((now-1)/2)) && a.get(now) > a.get(a.get((now-1)/2))) //
 						break;
-					}
-				}
-				if (isnext == true)
-					continue;
-				// 2
-				imsiy = i - 1;
-				imsix = j - 1;
-				if (imsiy >= n || imsix >= n)
-					continue;
-				while (imsiy >= 0 && imsix >= 0) // 안튀어나가도록
+				 int temp = a.get((now-1)/2);
+				 a.set((now-1)/2, a.get(now));
+				 a.set(now,temp);
+				 now = (now-1)/2;
+			 }
+		 }
+		 return a;
+	 }
+	 
+	 static ArrayList<Integer> Delete_Minheap(ArrayList<Integer> a)
+	 {
+		 if(a.size()==0) //배열 비었을 시
+		 {
+			 System.out.println("0");
+			 return a;
+		 }
+		 
+		 else //Delete 가능
+		 {
+			 int out = a.get(0); //root항이 제거됨
+			 a.set(0, a.get(a.size()-1)); //제일 끝항 값으로 root항 값을 덮어씌움
+			 a.remove(a.size()-1); //끝항 제거
+			 int now = 0;
+			 
+			 //정렬 -> root값을 맞는 위치까지 비교하여 내림
+			 while(now<a.size()/2)
+			 { 
+				 if(now*2+2 > a.size())
+					 break;
+				if(now*2+2 == a.size() || Math.abs(a.get(now*2+1))<=Math.abs(a.get(now*2+2))) //왼쪽이 오른쪽보다 더 작고 오른쪽이 존재할 때
 				{
-					if (chess[imsiy--][imsix--] == true) // 이미 있음 -> 공격가능
+					if(Math.abs(a.get(now))>= Math.abs(a.get(now*2+1))) //자식 왼쪽값이랑 비교해서 부모가 더 클경우
 					{
-						isnext = true;
-						break;
+						//값 change
+							if(Math.abs(a.get(now))== Math.abs(a.get(now*2+1)) && a.get(now) < a.get(now *2+1)) //절대값 같고 부모값이 더 작을때 -> 그대로
+								break;
+							int temp = a.get(now*2+1);
+							a.set(now*2+1, a.get(now));
+							a.set(now,temp);
+							now = now *2 +1;	
 					}
-				}
-				if (isnext == true)
-					continue;
-				// 3
-				imsiy = i + 1;
-				imsix = j - 1;
-				while (imsiy < n && imsix >= 0) // 안튀어나가도록
-				{
-					if (chess[imsiy++][imsix--] == true) // 이미 있음 -> 공격가능
-					{
-						isnext = true;
-						break;
-					}
-				}
-				if (isnext == true)
-					continue;
-				// 4
-				imsiy = i + 1;
-				imsix = j + 1;
-				while (imsiy < n && imsix < n) // 안튀어나가도록
-				{
-					if (chess[imsiy++][imsix++] == true) // 이미 있음 -> 공격가능
-					{
-						isnext = true;
-						break;
-					}
-				}
-				if (isnext == true)
-					continue;
-
-				// 다 비교해봤으나 공격할만한 대상 없음
-				{
-					if (count == n - 1) // 이미 3개 찍음
-					{
-						// 이번에 찍으면 4개
-						ans++;
-						continue;
-					}
-
-					chess[i][j] = true; // 해당 자리 표시
-					sero[i] = true;
-					garo[j] = true;
-					if (i < n)
-						DFS(i + 1, j, count + 1); // 다음 안닿게 놓을 수 있는 가장 가까운 자리
 					else
-						return;
-
-					// 끝나고 돌아오면
-					chess[i][j] = false;
-					sero[i] = false;
-					garo[j] = false;
+						break;
 				}
-			}
-		}
-	}
+				else 
+				{
+					if(a.get(now)>= Math.abs(a.get(now*2+2))) //오른쪽값과 비교
+					 {
+						//값 change
+						if(Math.abs(a.get(now))== Math.abs(a.get(now*2+2)) && a.get(now) < a.get(now *2+2)) //절대값 같고 부모값이 더 작을때 -> 그대로
+							break;
+						 int temp = a.get(now*2+2);
+						 a.set(now*2+2, a.get(now));
+						 a.set(now,temp);
+						 now = now*2+2;
+					 }	
+					else
+						break;
+				}
+			 }
+			 System.out.println(out);//root값
+			 return a; 
+		 }
+	 }
+	 
+	 static int min(int a, int b)
+	 {
+		 if(a<b)
+			 return a;
+		 else
+			 return b;
+	 }
+	 
 }
+
