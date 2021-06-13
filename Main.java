@@ -6,83 +6,82 @@ import java.math.RoundingMode;
 
 public class Main {
 
-	static int n;
-	static int b[];
-	static int operators[];
-	static TreeSet<Integer> ans;
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
+	static int goal;
+	static int goalsize;
+	static int n;
+	static boolean isbreak[];
+	static int min=0;
+	static StringBuilder imsians;
 	public static void main(String[] args) throws IOException {
 
-		//input
+		// input
+		String imsigoal = br.readLine();
+		goalsize = imsigoal.length();
+		if(goalsize == 6)
+				goalsize--;
+		goal = Integer.parseInt(imsigoal); //목표 채널
 		n = Integer.parseInt(br.readLine());
-		ans = new TreeSet<Integer>();
+		isbreak = new boolean[10];
+		imsians = new StringBuilder();
 		
-		String inputs[] = br.readLine().split(" ");
-		b = new int[n];
-		for(int i=0;i<n;i++)
-			b[i] = Integer.parseInt(inputs[i]);
-		
-		inputs = br.readLine().split(" ");
-		operators = new int[4];
-		for(int i=0;i<4;i++)
+		if(n !=0)
 		{
-			operators[i] = Integer.parseInt(inputs[i]);	
+			String imsis[] = br.readLine().split(" ");
+			Arrays.sort(imsis);
+			int j=0;
+			for(int i=0;i<10;i++)
+			{
+				if(j != imsis.length && Integer.parseInt(imsis[j]) == i) //고장난 수
+				{
+					j++;
+					isbreak[i] = true;
+				}
+				else
+					isbreak[i] = false;
+			}	
 		}
 		
-		//백트래킹
-		
-		DFS(0,b[0]);
-		
-		bw.write(ans.last()+"\n"); //최대
-		bw.write(ans.first()+"\n"); //최소
-		bw.flush();
-	}
-	
-	static void DFS(int count, int now)
-	{
-		if(count == n-1) //마지막 수, 연산 끝
+		min = Math.abs(100-goal); //그냥 +-로만 조절했을 시
+		if(min == 0)
 		{
-			ans.add(now);
+			bw.write(0+"\n");
 		}
 		else
 		{
-			for(int i=0;i<4;i++)
+			DFS(0);
+			bw.write(min+"\n");
+		}
+		bw.flush();
+	}
+
+	static void DFS(int count) throws IOException {
+		if(count == goalsize+1) 
+		{
+			int imsisu = Integer.parseInt(imsians.toString());
+			if(imsisu > 1000000)
+				return;
+			int imsimin = Math.abs(imsisu - goal); //
+			int jarisu = Integer.toString(imsisu).length();
+			imsimin += jarisu;
+			System.out.println("imsisu : "+imsisu+" imsimin : "+imsimin);
+			if(imsimin < min)
+				min = imsimin;
+		}
+		else
+		{
+			for(int i=0;i<10;i++)
 			{
-				if(operators[i] == 0) //연산자 고갈
-					continue;
-				else //연산자 사용가능
+				if(!isbreak[i]) //고장 안났을 시
 				{
-					operators[i]--; //하나 씀
-					int imsi = now;
-					switch (i) {
-					case 0:
-						imsi+= b[count+1];
-						break;
-					case 1:
-						imsi-= b[count+1];
-						break;
-					case 2:
-						imsi *= b[count+1];
-						break;
-					default: //나누기
-						if(imsi <0) //음수일 경우
-						{
-							imsi = Math.abs(imsi);
-							imsi /= b[count+1];
-							imsi *=-1;
-						}
-						else
-							imsi /= b[count+1];
-					}
-					
-					DFS(count+1, imsi);
-					
-					operators[i]++;
+					//System.out.println("i : "+i+" count : "+count);
+					imsians.append(i); //붙이기
+					DFS(count+1);
+					imsians.deleteCharAt(count);
 				}
 			}
 		}
 	}
 }
-
