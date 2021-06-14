@@ -5,83 +5,82 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 public class Main {
-
+	
+	static int n;
+	static int k;
+	static boolean iscatch = false;
+	static int visittime[];
+	static int min =0;
+	static Queue<Qin> q;
+	
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-	static int goal;
-	static int goalsize;
-	static int n;
-	static boolean isbreak[];
-	static int min=0;
-	static StringBuilder imsians;
 	public static void main(String[] args) throws IOException {
 
 		// input
-		String imsigoal = br.readLine();
-		goalsize = imsigoal.length();
-		if(goalsize == 6)
-				goalsize--;
-		goal = Integer.parseInt(imsigoal); //목표 채널
-		n = Integer.parseInt(br.readLine());
-		isbreak = new boolean[10];
-		imsians = new StringBuilder();
+		String imsi[] = br.readLine().split(" ");
+		n = Integer.parseInt(imsi[0]);
+		k = Integer.parseInt(imsi[1]);
+		q = new LinkedList<Qin>();
+		visittime = new int[100001];
 		
-		if(n !=0)
-		{
-			String imsis[] = br.readLine().split(" ");
-			Arrays.sort(imsis);
-			int j=0;
-			for(int i=0;i<10;i++)
-			{
-				if(j != imsis.length && Integer.parseInt(imsis[j]) == i) //고장난 수
-				{
-					j++;
-					isbreak[i] = true;
-				}
-				else
-					isbreak[i] = false;
-			}	
-		}
-		
-		min = Math.abs(100-goal); //그냥 +-로만 조절했을 시
-		if(min == 0)
-		{
-			bw.write(0+"\n");
-		}
-		else
-		{
-			DFS(0);
-			bw.write(min+"\n");
-		}
+		BFS(0,n);
+		bw.write(min+"\n");
 		bw.flush();
 	}
-
-	static void DFS(int count) throws IOException {
-		if(count == goalsize+1) 
+	
+	static void BFS(int time, int now) throws IOException
+	{
+		System.out.println("time : "+time+" now : "+now);
+		if(now == k) //동생 잡음
 		{
-			int imsisu = Integer.parseInt(imsians.toString());
-			if(imsisu > 1000000)
-				return;
-			int imsimin = Math.abs(imsisu - goal); //
-			int jarisu = Integer.toString(imsisu).length();
-			imsimin += jarisu;
-			System.out.println("imsisu : "+imsisu+" imsimin : "+imsimin);
-			if(imsimin < min)
-				min = imsimin;
+			min = time;
+			iscatch = true;
+			q.clear();
+			return;
 		}
-		else
+		else if(iscatch) //이미 잡음
+			return;
+		else if(visittime[now] != 0 && visittime[now] <time)
 		{
-			for(int i=0;i<10;i++)
+			if(q.isEmpty())
+				return;
+			else
 			{
-				if(!isbreak[i]) //고장 안났을 시
-				{
-					//System.out.println("i : "+i+" count : "+count);
-					imsians.append(i); //붙이기
-					DFS(count+1);
-					imsians.deleteCharAt(count);
-				}
+				Qin imsi = q.poll();
+				BFS(imsi.time,imsi.now);
 			}
 		}
+		else //아직 못잡음
+		{
+			if(now> k/3 && now>0)
+			{
+				q.add(new Qin(time+1, now-1)); //한칸 뒤로
+			}
+			if(now> k/3 &&now<100000)
+				q.add(new Qin(time+1,now+1)); //앞으로
+			if(now*2 < 100000)
+				q.add(new Qin(time+1,now*2)); //순간이동
+			
+			if(q.isEmpty())
+				return;
+			else
+			{
+				Qin imsi = q.poll();
+				BFS(imsi.time,imsi.now);
+			}
+		}
+	}
+}
+
+class Qin{
+	int time;
+	int now;
+	
+	Qin(int time, int now)
+	{
+		this.time = time;
+		this.now = now;
 	}
 }
