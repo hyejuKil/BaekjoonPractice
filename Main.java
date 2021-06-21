@@ -1,86 +1,78 @@
 import java.util.*;
 import java.io.*;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 
 public class Main {
 	
-	static int n;
-	static int k;
-	static boolean iscatch = false;
-	static int visittime[];
-	static int min =0;
-	static Queue<Qin> q;
-	
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
+	
+	static int n;
+	static int m;
+	static Queue<Node> q;
+	static int isvisit[];
+	static int anstime = -1;
+	
 	public static void main(String[] args) throws IOException {
 
 		// input
-		String imsi[] = br.readLine().split(" ");
-		n = Integer.parseInt(imsi[0]);
-		k = Integer.parseInt(imsi[1]);
-		q = new LinkedList<Qin>();
-		visittime = new int[100001];
+		String inputs[] = br.readLine().split(" ");
+		 n = Integer.parseInt(inputs[0]);
+		 m = Integer.parseInt(inputs[1]);
 		
-		BFS(0,n);
-		bw.write(min+"\n");
+		 q = new LinkedList<Node>(); 
+		 isvisit = new int[100001];
+		
+		BFS(n,0);
+		bw.write(anstime+"\n");
 		bw.flush();
 	}
 	
-	static void BFS(int time, int now) throws IOException
+	//방문 시각보다 더 빠르게 해당 지점에 도착시 넣기
+	static void BFS(int now, int time)
 	{
-		System.out.println("time : "+time+" now : "+now);
-		if(now == k) //동생 잡음
+		System.out.println(now+" "+time);
+		if(now == m)
 		{
-			min = time;
-			iscatch = true;
-			q.clear();
+			if(anstime == -1)
+				anstime = time;
 			return;
 		}
-		else if(iscatch) //이미 잡음
-			return;
-		else if(visittime[now] != 0 && visittime[now] <time)
+		else //방문시각 최단, 또는 처음 방문
 		{
-			if(q.isEmpty())
-				return;
-			else
+			if(now>0 && now>m/2 && (isvisit[now-1] == 0 || isvisit[now-1] > time+1)) //-할 가치가 있는 경우
 			{
-				Qin imsi = q.poll();
-				BFS(imsi.time,imsi.now);
+				isvisit[now-1] = time+1;
+				q.add(new Node(now-1,time+1));
 			}
-		}
-		else //아직 못잡음
-		{
-			if(now> k/3 && now>0)
+			if(now*2 <= 100000) //*2 할 가치가 있는 경우
 			{
-				q.add(new Qin(time+1, now-1)); //한칸 뒤로
+				if(isvisit[now*2] == 0 ||isvisit[now*2] > time+1)
+				{
+					isvisit[now*2] = time+1;
+					q.add(new Node(now*2, time+1));		
+				}
 			}
-			if(now> k/3 &&now<100000)
-				q.add(new Qin(time+1,now+1)); //앞으로
-			if(now*2 < 100000)
-				q.add(new Qin(time+1,now*2)); //순간이동
-			
-			if(q.isEmpty())
-				return;
-			else
+			if(now < 100000  && isvisit[now+1] == 0 ||isvisit[now+1] > time+1) //now가 더 클 경우
 			{
-				Qin imsi = q.poll();
-				BFS(imsi.time,imsi.now);
+				isvisit[now+1] = time+1;
+				q.add(new Node(now+1, time+1));	
+			}
+				
+			if(!q.isEmpty())
+			{
+				Node imsi = q.poll();
+				BFS(imsi.x, imsi.time);
 			}
 		}
 	}
 }
 
-class Qin{
-	int time;
-	int now;
-	
-	Qin(int time, int now)
-	{
+class Node{
+	public Node(int x, int time) {
+		// TODO Auto-generated constructor stub
+		this.x = x;
 		this.time = time;
-		this.now = now;
 	}
+	int x;
+	int time;
 }
