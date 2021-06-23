@@ -8,7 +8,7 @@ public class Main {
 	
 	static int n;
 	static int m;
-	static Queue<Node> q;
+	static Queue<Integer> q;
 	static int isvisit[];
 	static int anstime = -1;
 	
@@ -19,60 +19,53 @@ public class Main {
 		 n = Integer.parseInt(inputs[0]);
 		 m = Integer.parseInt(inputs[1]);
 		
-		 q = new LinkedList<Node>(); 
+		 q = new LinkedList<Integer>(); 
 		 isvisit = new int[100001];
 		
-		BFS(n,0);
+		BFS(n);
 		bw.write(anstime+"\n");
 		bw.flush();
 	}
 	
 	//방문 시각보다 더 빠르게 해당 지점에 도착시 넣기
-	static void BFS(int now, int time)
+	static void BFS(int now)
 	{
-		System.out.println(now+" "+time);
+		//System.out.println(now+" "+isvisit[now]);
 		if(now == m)
 		{
 			if(anstime == -1)
-				anstime = time;
+				anstime = isvisit[now];
 			return;
 		}
 		else //방문시각 최단, 또는 처음 방문
 		{
-			if(now>0 && now>m/2 && (isvisit[now-1] == 0 || isvisit[now-1] > time+1)) //-할 가치가 있는 경우
+			if(now>0 && now>m/2 && (isvisit[now-1] == 0 || isvisit[now-1] > isvisit[now]+1)) //-할 가치가 있는 경우
 			{
-				isvisit[now-1] = time+1;
-				q.add(new Node(now-1,time+1));
+				isvisit[now-1] = isvisit[now]+1;
+				q.add(now-1);
 			}
-			if(now*2 <= 100000) //*2 할 가치가 있는 경우
+			if(now*2 <= 100000 && now<m) //*2 할 가치가 있는 경우
 			{
-				if(isvisit[now*2] == 0 ||isvisit[now*2] > time+1)
+				if(isvisit[now*2] == 0 ||isvisit[now*2] > isvisit[now]+1)
 				{
-					isvisit[now*2] = time+1;
-					q.add(new Node(now*2, time+1));		
+					isvisit[now*2] = isvisit[now]+1;
+					q.add(now*2);		
 				}
 			}
-			if(now < 100000  && isvisit[now+1] == 0 ||isvisit[now+1] > time+1) //now가 더 클 경우
+			if(now < 100000 && now<m) //now가 더 클 경우
 			{
-				isvisit[now+1] = time+1;
-				q.add(new Node(now+1, time+1));	
+				if(isvisit[now+1] == 0 ||isvisit[now+1] > isvisit[now]+1)
+				{
+					isvisit[now+1] = isvisit[now]+1;
+					q.add(now+1);		
+				}
 			}
 				
 			if(!q.isEmpty())
 			{
-				Node imsi = q.poll();
-				BFS(imsi.x, imsi.time);
+				BFS(q.poll());
 			}
 		}
 	}
 }
 
-class Node{
-	public Node(int x, int time) {
-		// TODO Auto-generated constructor stub
-		this.x = x;
-		this.time = time;
-	}
-	int x;
-	int time;
-}
