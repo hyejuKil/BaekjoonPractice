@@ -1,71 +1,105 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Main {
-	
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 	
 	static int n;
-	static int m;
-	static Queue<Integer> q;
-	static int isvisit[];
-	static int anstime = -1;
+	static int stair[];//각 계단의 비용
+	static int cost[]; //해당 계단까지 올라가는 비용
+	static int max=0;
+	static Queue<Move> q;
 	
 	public static void main(String[] args) throws IOException {
 
 		// input
-		String inputs[] = br.readLine().split(" ");
-		 n = Integer.parseInt(inputs[0]);
-		 m = Integer.parseInt(inputs[1]);
+		n = Integer.parseInt(br.readLine());
+		stair = new int[n];
+		cost = new int[n];
+		q = new LinkedList<Move>();
+		for(int i=0;i<n;i++)
+		{
+			stair[i] = Integer.parseInt(br.readLine());
+		}
 		
-		 q = new LinkedList<Integer>(); 
-		 isvisit = new int[100001];
+		cost[0] = stair[0];
+		DFS(0,0,cost[0]);
 		
-		BFS(n);
-		bw.write(anstime+"\n");
+		bw.write(max+"\n");
 		bw.flush();
 	}
 	
-	//방문 시각보다 더 빠르게 해당 지점에 도착시 넣기
-	static void BFS(int now)
+	//아마 백트래킹..?
+	static void DFS(int count, int step,int costhap)
 	{
-		//System.out.println(now+" "+isvisit[now]);
-		if(now == m)
+		System.out.println(count+" : "+cost[count]+" , step : "+step+" costhap : "+costhap);
+		if(count ==n-1) //계단 끝
 		{
-			if(anstime == -1)
-				anstime = isvisit[now];
-			return;
-		}
-		else //방문시각 최단, 또는 처음 방문
-		{
-			if(now>0 && now>m/2 && (isvisit[now-1] == 0 || isvisit[now-1] > isvisit[now]+1)) //-할 가치가 있는 경우
-			{
-				isvisit[now-1] = isvisit[now]+1;
-				q.add(now-1);
-			}
-			if(now*2 <= 100000 && now<m) //*2 할 가치가 있는 경우
-			{
-				if(isvisit[now*2] == 0 ||isvisit[now*2] > isvisit[now]+1)
-				{
-					isvisit[now*2] = isvisit[now]+1;
-					q.add(now*2);		
-				}
-			}
-			if(now < 100000 && now<m) //now가 더 클 경우
-			{
-				if(isvisit[now+1] == 0 ||isvisit[now+1] > isvisit[now]+1)
-				{
-					isvisit[now+1] = isvisit[now]+1;
-					q.add(now+1);		
-				}
-			}
-				
+			if(cost[n-1] > max && step <2)
+				max = cost[n-1];
+			
 			if(!q.isEmpty())
 			{
-				BFS(q.poll());
+				Move imsi = q.poll();
+				DFS(imsi.count, imsi.step,imsi.costhap);
+			}
+		}
+		else //오르는 중
+		{
+			System.out.println("in : "+(count)+" : "+cost[count]+" "+step);
+			if(costhap != cost[count])
+			{
+				System.out.println("in");
+				if(!q.isEmpty())
+				{
+					Move imsi = q.poll();
+					DFS(imsi.count, imsi.step,imsi.costhap);
+				}	
+			}
+			//한칸 오르기
+			if(step!=1 )
+			{
+				if(cost[count+1] < cost[count]+stair[count+1])
+				{
+					cost[count+1] = cost[count]+stair[count+1];
+					System.out.println("in 1 : "+(count+1)+" : "+cost[count+1]);
+					q.add(new Move(count+1, step+1,cost[count+1])); //한칸 이동	
+				}
+			}
+			//두칸 오르기
+			if(count+2 <n && cost[count+2] < cost[count]+stair[count+2])
+			{
+				cost[count+2] = cost[count] + stair[count+2];
+				System.out.println("in 2 : "+(count+2)+" : "+cost[count+2]);
+				q.add(new Move(count+2, 0,cost[count+2]));	
+			}
+			
+			if(!q.isEmpty())
+			{
+				Move imsi = q.poll();
+				DFS(imsi.count, imsi.step,imsi.costhap);
 			}
 		}
 	}
 }
 
+class Move{
+	int count;
+	int step;
+	int costhap;
+	
+	Move(int count, int step,int costhap)
+	{
+		this.count = count;
+		this.step = step;
+		this.costhap =costhap;
+	}
+}
