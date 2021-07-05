@@ -3,103 +3,69 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 
 public class Main {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 	
-	static int n;
-	static int stair[];//각 계단의 비용
-	static int cost[]; //해당 계단까지 올라가는 비용
-	static int max=0;
-	static Queue<Move> q;
-	
 	public static void main(String[] args) throws IOException {
 
 		// input
-		n = Integer.parseInt(br.readLine());
-		stair = new int[n];
-		cost = new int[n];
-		q = new LinkedList<Move>();
+		//그냥 문자 -> 현재 커서 위치에 넣기, 커서 +1
+		// < -> 현재 위치가 1 이상일 경우 커서 --
+		// > -> 현재 위치가 문자열길이보다 작을경우 커서 ++
+		// - -> 하나 지우고 커서 --
+		
+		int n = Integer.parseInt(br.readLine());
+		
 		for(int i=0;i<n;i++)
 		{
-			stair[i] = Integer.parseInt(br.readLine());
-		}
-		
-		cost[0] = stair[0];
-		DFS(0,0,cost[0]);
-		
-		bw.write(max+"\n");
-		bw.flush();
-	}
-	
-	//아마 백트래킹..?
-	static void DFS(int count, int step,int costhap)
-	{
-		System.out.println(count+" : "+cost[count]+" , step : "+step+" costhap : "+costhap);
-		if(count ==n-1) //계단 끝
-		{
-			if(cost[n-1] > max && step <2)
-				max = cost[n-1];
-			
-			if(!q.isEmpty())
+			String s = br.readLine();//입력받은 문자열
+			ArrayList<Character> ans = new ArrayList<Character>();
+			int pointer =0;
+			for(int j=0;j<s.length();j++) 
 			{
-				Move imsi = q.poll();
-				DFS(imsi.count, imsi.step,imsi.costhap);
-			}
-		}
-		else //오르는 중
-		{
-			System.out.println("in : "+(count)+" : "+cost[count]+" "+step);
-			if(costhap != cost[count])
-			{
-				System.out.println("in");
-				if(!q.isEmpty())
-				{
-					Move imsi = q.poll();
-					DFS(imsi.count, imsi.step,imsi.costhap);
+				char now = s.charAt(j);
+				//System.out.println("now : "+ now+" pointer : "+pointer);
+				switch(now) {
+				// < -> 현재 위치가 1 이상일 경우 커서 --
+				case '<':
+					if(pointer >0)
+						pointer--;
+					break;
+				case '>':
+					if(pointer <ans.size())
+						pointer++;
+					break;
+				case '-':
+					if(ans.isEmpty() || pointer ==0)
+						break;
+					else {
+						ans.remove(pointer-1);
+						pointer--;
+					}
+					break;
+				default:
+					ans.add(pointer, now);
+					pointer++;
 				}	
 			}
-			//한칸 오르기
-			if(step!=1 )
+			for(int k=0;k<ans.size();k++)
 			{
-				if(cost[count+1] < cost[count]+stair[count+1])
-				{
-					cost[count+1] = cost[count]+stair[count+1];
-					System.out.println("in 1 : "+(count+1)+" : "+cost[count+1]);
-					q.add(new Move(count+1, step+1,cost[count+1])); //한칸 이동	
-				}
+				bw.write(ans.get(k)+"");
 			}
-			//두칸 오르기
-			if(count+2 <n && cost[count+2] < cost[count]+stair[count+2])
-			{
-				cost[count+2] = cost[count] + stair[count+2];
-				System.out.println("in 2 : "+(count+2)+" : "+cost[count+2]);
-				q.add(new Move(count+2, 0,cost[count+2]));	
-			}
-			
-			if(!q.isEmpty())
-			{
-				Move imsi = q.poll();
-				DFS(imsi.count, imsi.step,imsi.costhap);
-			}
+			bw.write("\n");
 		}
-	}
-}
-
-class Move{
-	int count;
-	int step;
-	int costhap;
-	
-	Move(int count, int step,int costhap)
-	{
-		this.count = count;
-		this.step = step;
-		this.costhap =costhap;
+		bw.flush();
+		
+		//linkedlist 쓰면 삽입, 삭제에서 시간초과
+		//Arrayslit 쓰면 삽입시 밀어내서 시간초과
 	}
 }
