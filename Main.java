@@ -6,59 +6,64 @@ public class Main {
 	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 	
 	static int n;
-	static int ans=0;
-	static boolean tile[][];
+	static HashMap<int[], Integer> su;
 	
 	public static void main(String[] args) throws IOException {
 		
-		n = Integer.parseInt(br.readLine());
-		tile = new boolean[2][n];
-		
-		DFS(0);
-		
-		
-		bw.write(ans+"\n");
-		bw.flush();
-
-	}
-	static void DFS(int count) {
-		System.out.println(count);
-		if(n == count) //타일 다 채움
+		int a, b, c;
+		su = new HashMap<int[], Integer>();
+		while(true)
 		{
-			ans++;
-		}
-		else //타일 덜채움
-		{
-			for(int i=0;i<2;i++)
+			String[] inputs = br.readLine().split(" ");
+			a = Integer.parseInt(inputs[0]);
+			b = Integer.parseInt(inputs[1]);
+			c = Integer.parseInt(inputs[2]);
+			
+			if(a==-1 && b==-1 && c==-1)
+				break;
+			else
 			{
-				if(i==1 && count<(n/2))
-					break;
-				for(int j=0;j<n;j++)
-				{
-					if(j>0 && count==0)
-						break;
-					if(!tile[i][j])
-					{
-						System.out.println(i+","+j);
-						tile[i][j] = true;
-						if(j!=n-1 && !tile[i][j+1])//가로
-						{
-							System.out.println("garo : "+i+","+(j+1));
-							tile[i][j+1] = true;
-							DFS(count+1);
-							tile[i][j+1] = false;
-						}
-						else if(i==0 && !tile[i+1][j]) //세로
-						{
-							System.out.println("sero : "+(i+1)+","+j);
-							tile[i+1][j] = true;
-							DFS(count+1);
-							tile[i+1][j] = false;
-						}
-						tile[i][j] = false;
-					}
-				}
+				jegwi(a,b,c);
+				bw.write("w("+a+", "+b+", "+c+") = "+su.get(new int[] {a,b,c})+"\n");
+				
 			}
+		}
+		bw.flush();
+	}
+	
+	static int jegwi(int a,int b, int c)
+	{
+		int[] imsis = new int[] {a,b,c};
+		System.out.println(a+" "+b+" "+c);
+		if(su.containsKey(imsis))
+		{
+			System.out.println("존재");
+			return su.get(imsis);
+		}
+		if(a<=0 || b<=0 || c<=0) 
+		{
+			int imsi = 1;
+			su.put(imsis, imsi);
+			System.out.println("imsis : "+su.get(imsis));
+			return imsi;
+		}
+		else if(a>20 || b>20 || c>20)
+		{
+			int imsi = jegwi(20,20,20);
+			su.put(imsis, imsi);
+			return imsi; 
+		}
+		else if(a<b && b<c)
+		{
+			int imsi = jegwi(a,b,c-1)+jegwi(a,b-1,c-1)-jegwi(a,b-1,c);
+			su.put(imsis, imsi);
+			return imsi; 
+		}
+		else 
+		{
+			int imsi = jegwi(a-1,b,c)+jegwi(a-1,b,c-1)-jegwi(a-1,b-1,c-1);
+			su.put(imsis, imsi);
+			return imsi; 
 		}
 	}
 }
