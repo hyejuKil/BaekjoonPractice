@@ -5,42 +5,45 @@ import java.util.*;
 public class Main {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
-	static int n;
-	static long mem[]; 
-	static int juice[];
 	
-	public static void main(String[] args) throws IOException {
-
-		n = Integer.parseInt(br.readLine());
-		mem = new long[10001];
-		juice = new int[n+1];
+	static int n,k;
+	static long mem[];
+	static int coin[];
+	
+	public static void main(String argv[]) throws NumberFormatException, IOException
+	{
+		String s[] = br.readLine().split(" ");
+		n = Integer.parseInt(s[0]);
+		k = Integer.parseInt(s[1]);
 		
-		for(int i=1;i<=n;i++)
+		mem = new long[k+1];
+		coin = new int[n+1];
+		
+		for(int i=0;i<n;i++)
 		{
-			juice[i] = Integer.parseInt(br.readLine());
+			coin[i] = Integer.parseInt(br.readLine());
 		}
-
-		mem[0] = 0;
-		mem[1] = juice[1];
-		mem[2] = juice[1]+juice[2];
-		
-		long max =0;
-		for(int i=3;i<=n;i++)
+		for(int i=1;i<=k;i++) //수만큼
 		{
-			long imsi = mem[i-3]+juice[i-1];
-			for(int j=2;j<=n && i>j;j++)
+			long min = 0;
+			for(int j=0;j<n;j++) //동전 종류만큼
 			{
-				if(mem[i-j]>imsi)
-					imsi = mem[i-j];
+				long imsi;
+				if(i-coin[j]>=0)
+				{
+					imsi = mem[i-coin[j]]+1;
+					if(imsi<min || min == 0)
+						min = imsi;
+				}
 			}
-			mem[i] = imsi+juice[i];
-			if(mem[i]>max)
-				max = mem[i];
+			
+			mem[i] = min;
 		}
 		
-		bw.write(max+"\n");
+		if(mem[k] !=0)
+			bw.write(mem[k]+"\n");
+		else
+			bw.write(-1+"\n");
 		bw.flush();
-	}
-	
+	}	
 }
