@@ -1,39 +1,35 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
 import java.io.*;
 import java.util.*;
 public class B_2293 {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 	
-	static int n,k;
-	static int coins[];
-	static int mem[];
-	
 	public static void main(String argv[]) throws NumberFormatException, IOException
 	{
-		String input[] = br.readLine().split(" ");
-		n = Integer.parseInt(input[0]);
-		k = Integer.parseInt(input[1]);
-		coins = new int[n+1];
-		mem = new int[k+1];
+		String s[] = br.readLine().split(" ");
+		int n = Integer.parseInt(s[0]);
+		int k = Integer.parseInt(s[1]);
+		int mem[] = new int[100001];
 		
-		for(int i=1;i<=n;i++)
+		
+		for(int i=0;i<n;i++) //동전 수만큼 반복
 		{
-			coins[i] = Integer.parseInt(br.readLine());
-		}
-		
-		mem[coins[0]] = 1;
-		
-		for(int i=1;i<=n;i++)
-		{
-			for(int j=coins[i];j<=k;j++)
+			int coin = Integer.parseInt(br.readLine());
+			mem[coin] +=1;
+			for(int j=coin;j<=k;j++) //동전으로 카운팅
 			{
-				mem[j] += mem[j-coins[i]];
+				mem[j] += mem[j-coin];
 			}
 		}
 		
 		bw.write(mem[k]+"\n");
 		bw.flush();
-		
-	}
+	}	
 }
-//타인 코드 참고 : https://hu-coding.tistory.com/31
+
