@@ -35,14 +35,12 @@ public class B_12851 {
 		 if(n>m)
 		 {
 				bw.write((n-m)+"\n");
-				bw.write(1+"\n");
 				bw.flush();
 				return;
 		 }
 		 
 		BFS(n);
 		bw.write(anstime+"\n");
-		bw.write(count+"\n");
 		bw.flush();
 	}
 	
@@ -56,10 +54,7 @@ public class B_12851 {
 			if(anstime == -1)
 			{
 				anstime = isvisit[now];
-				count++;
 			}
-			else if(anstime == isvisit[now])
-				count++;
 			else if(anstime < isvisit[now]) //아마 끝?
 				return;
 			//System.out.println("in : "+count);
@@ -90,9 +85,9 @@ public class B_12851 {
 			}
 			if(now*2 <= 100000 ) //*2 할 가치가 있는 경우
 			{
-				if(isvisit[now*2] == -1 || isvisit[now*2] == isvisit[now]+1)
+				if(isvisit[now*2] == -1 || isvisit[now*2] <= isvisit[now]+1)
 				{
-					isvisit[now*2] = isvisit[now]+1;
+					isvisit[now*2] = isvisit[now];
 					q.add(now*2);		
 				}
 			}

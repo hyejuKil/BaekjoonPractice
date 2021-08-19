@@ -35,7 +35,7 @@ public class B_15663 {
 
 		Collections.sort(b);
 
-		DFS(0);
+		DFS(0,0);
 		
 		Iterator<String> itr = anst.iterator();
 		while(itr.hasNext())
@@ -45,7 +45,7 @@ public class B_15663 {
 		bw.flush();
 	}
 
-	static void DFS(int count) throws IOException {
+	static void DFS(int now,int count) throws IOException {
 		if (count == m) // 출력
 		{
 			StringBuilder imsist = new StringBuilder();
@@ -61,13 +61,13 @@ public class B_15663 {
 			anst.add(imsist.toString());
 		} 
 		else {
-			for (int i = 0; i < n; i++) // 모든 문자 돌면서
+			for (int i = now; i < n; i++) // 모든 문자 돌면서
 			{
 				if(!isused[i])
 				{
 					isused[i] = true;
 					ans[count] = b.get(i);
-					DFS(count+1);	
+					DFS(i,count+1);	
 					isused[i] = false;
 				}
 			}
